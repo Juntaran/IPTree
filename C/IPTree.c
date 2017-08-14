@@ -125,10 +125,10 @@ void deleteRoute(int Route, int Mask) {
             currentNode = currentNode->right;
         }
     }
-    if (i < Mask) {
-        printf("Delete Error\n");
-        return;
-    }
+    // if (i < Mask) {
+        // printf("Delete Error\n");
+        // return;
+    // }
     currentNode->port = -1;
     currentNode->left = NULL;
     currentNode->right = NULL;
