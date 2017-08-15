@@ -31,11 +31,18 @@ func main() {
 		fmt.Printf("%32b\n", Route)
 		routeTree.InsertRoute(Route, Mask, Port)
 	}
-	fmt.Println(routeTree.Size)
+	routeTree.RouteRuleNumber()
+	routeTree.LevelTraverse()
 
 	fmt.Println("Input Ip you want Search")
 	ip := make([]int, 4)
 	fmt.Scanf("%d.%d.%d.%d\n", &ip[0], &ip[1], &ip[2], &ip[3])
 	iIp := ip[0]<<24 | ip[1]<<16 | ip[2]<<8 | ip[3]<<0
-	routeTree.LocateRoute(iIp)
+	routeTree.SearchRoute(iIp)
+
+	// 删除ip这条路由 掩码为/32
+	routeTree.DeleteRoute(iIp, 32)
+	routeTree.LevelTraverse()
+	routeTree.SearchRoute(iIp)
+	routeTree.RouteRuleNumber()
 }

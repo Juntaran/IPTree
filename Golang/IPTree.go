@@ -71,8 +71,8 @@ func (tree *routeTree) InsertRoute(iRoute int, iMask uint, iPort int) {
 			}
 			currentNode = currentNode.right
 		}
-		tree.Size ++
 	}
+	tree.Size ++
 	currentNode.port = iPort
 }
 
@@ -109,8 +109,9 @@ func (tree *routeTree) LocateRoute(ip int) *routeNode {
 // 删除一条路由
 func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 	judge := 0
-	fmt.Printf("Input route: %8x, mask: %4d\n", iRoute, iMask)
-	var currentNode *routeNode = tree.root
+	fmt.Printf("Delete route: %32b, mask: %4d\n", iRoute, iMask)
+	root := tree.root
+	var currentNode *routeNode = root
 	var i uint
 	for i = 0; i < iMask; i++ {
 		// 根据ip二进制从左到右按位解析
@@ -119,7 +120,7 @@ func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 			if currentNode.left == nil {
 				currentNode.left = CreateNode()
 			}
-			currentNode = currentNode.right
+			currentNode = currentNode.left
 		} else {
 			if currentNode.right == nil {
 				currentNode.right = CreateNode()
@@ -134,6 +135,7 @@ func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 	currentNode.port = -1
 	currentNode.left = nil
 	currentNode.right = nil
+	tree.Size --
 	fmt.Println("Delete Success")
 	return
 }
@@ -141,6 +143,43 @@ func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 // 查找路由表函数
 func (tree *routeTree)SearchRoute(ip int) int {
 	currentNode := tree.LocateRoute(ip)
-	fmt.Printf("Get %d\n", currentNode.port)
+	if currentNode.port == -1 {
+		fmt.Printf("Not in rule, %d\n", currentNode.port)
+	}   else {
+		fmt.Printf("Get %d\n", currentNode.port)
+	}
 	return currentNode.port
+}
+
+// 层序遍历
+func (tree *routeTree)LevelTraverse()  {
+	fmt.Println("Start LevelTraverse")
+	if tree.root == nil {
+		return
+	}
+	root := tree.root
+	var treeQueue []*routeNode
+	treeQueue = append(treeQueue, root)
+	var current int = 0
+	var last int = 1
+	for current < len(treeQueue) {
+		last = len(treeQueue)
+		for current < last {
+			fmt.Printf("%4d ", treeQueue[current].port)
+			if treeQueue[current].left != nil {
+				treeQueue = append(treeQueue, treeQueue[current].left)
+			}
+			if treeQueue[current].right != nil {
+				treeQueue = append(treeQueue, treeQueue[current].right)
+			}
+			current ++
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+}
+
+// 显示当前routeTree中的规则数量
+func (tree *routeTree)RouteRuleNumber()  {
+	fmt.Println("The Rule Number is", tree.Size - 1)
 }
