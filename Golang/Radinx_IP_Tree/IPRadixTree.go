@@ -154,7 +154,7 @@ func (tree *Radix_tree) Radix_Tree_Delete(cidr string) error {
 
 	var bit uint32 = 0x80000000
 	node := tree.root
-	for ; (node != nil) && (bit & mask == 1);  {
+	for ; (node != nil) && (bit & mask != 0);  {
 		if ip & bit != 0 {
 			node = node.right
 		} else {
@@ -217,5 +217,6 @@ func (tree *Radix_tree) Radix_Tree_Search(cidr string) []uint32 {
 		}
 		bit >>= 1
 	}
+	sort.Sort(value)
 	return value
 }
