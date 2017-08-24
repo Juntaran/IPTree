@@ -4,7 +4,7 @@
   * Date:   2017/8/14 11:40 
   */
 
-package IPTree
+package Binary_IP_Tree
 
 import "fmt"
 
@@ -12,7 +12,7 @@ import "fmt"
 type routeNode struct {
 	left	*routeNode
 	right	*routeNode
-	port	int
+	port	[]int
 }
 
 // 路由树结构
@@ -26,7 +26,7 @@ func CreateNode() *routeNode {
 	pNode := new(routeNode)
 	pNode.left = nil
 	pNode.right = nil
-	pNode.port = -1
+	pNode.port = nil
 	return pNode
 }
 
@@ -73,7 +73,7 @@ func (tree *routeTree) InsertRoute(iRoute int, iMask uint, iPort int) {
 		}
 	}
 	tree.Size ++
-	currentNode.port = iPort
+	currentNode.port = append(currentNode.port, iPort)
 }
 
 // 定位路由节点
@@ -81,8 +81,7 @@ func (tree *routeTree) LocateRoute(ip int) *routeNode {
 	var judge int = 0
 	root := tree.root
 	var currentNode *routeNode = root
-	if currentNode.port != -1 {
-	}
+
 	fmt.Printf("start locate ip: %32b\n", ip)
 	var i uint
 	for i = 0; i < 32; i++ {
@@ -132,7 +131,7 @@ func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 		fmt.Println("Delete Error.")
 		return
 	}
-	currentNode.port = -1
+	currentNode.port = nil
 	currentNode.left = nil
 	currentNode.right = nil
 	tree.Size --
@@ -141,9 +140,9 @@ func (tree *routeTree) DeleteRoute(iRoute int, iMask uint) {
 }
 
 // 查找路由表函数
-func (tree *routeTree)SearchRoute(ip int) int {
+func (tree *routeTree)SearchRoute(ip int) []int {
 	currentNode := tree.LocateRoute(ip)
-	if currentNode.port == -1 {
+	if currentNode.port == nil {
 		fmt.Printf("Not in rule, %d\n", currentNode.port)
 	}   else {
 		fmt.Printf("Get %d\n", currentNode.port)
@@ -165,7 +164,7 @@ func (tree *routeTree)LevelTraverse()  {
 	for current < len(treeQueue) {
 		last = len(treeQueue)
 		for current < last {
-			fmt.Printf("%4d ", treeQueue[current].port)
+			fmt.Printf("%v ", treeQueue[current].port)
 			if treeQueue[current].left != nil {
 				treeQueue = append(treeQueue, treeQueue[current].left)
 			}

@@ -7,7 +7,7 @@
 package main
 
 import (
-	"IPTree"
+	IPTree "IPTree/Binary_IP_Tree"
 	"fmt"
 )
 
