@@ -7,11 +7,10 @@
 package ACLTree
 
 import (
-	"IPTree/Radinx_IP_Tree/utils"
-	utils2 "IPTree/ACLTree/utils"
 	"errors"
 	"sort"
 	"strconv"
+	"IPTree/ACLTree/utils"
 )
 
 // Nginx radix tree source code
@@ -23,8 +22,8 @@ type acl_node struct {
 	left		*acl_node
 	right		*acl_node
 	parent		*acl_node
-	white 		utils.Uint32Slice		// 白名单 port
-	black		utils.Uint32Slice		// 黑名单 port
+	white 		utils.Uint32Slice		// 白名单 port_list
+	black		utils.Uint32Slice		// 黑名单 port_list
 }
 
 // acl tree 结构体  对外开放
@@ -45,7 +44,6 @@ func (tree *ACL_tree) newNode() (p *acl_node) {
 		p.parent = nil
 		p.white = nil
 		p.black = nil
-		p.protocol = nil
 		return p
 	}
 
@@ -253,8 +251,8 @@ func (tree *ACL_tree) ACL_Tree_Insert_Lot(cidr string, white string, black strin
 	var blackTemp []uint32
 	if num1 == 0 && num2 == 0 {
 		// 输入的黑白名单都是单独的数字
-		whiteTemp = utils2.StringToUint32Slice(white)
-		blackTemp = utils2.StringToUint32Slice(black)
+		whiteTemp = utils.StringToUint32Slice(white)
+		blackTemp = utils.StringToUint32Slice(black)
 	}
 	if num1 == 1 && num2 == 0 {
 		// 白名单为端口段，黑名单为单独的数字
@@ -263,7 +261,7 @@ func (tree *ACL_tree) ACL_Tree_Insert_Lot(cidr string, white string, black strin
 		for i := whiteStart; i <= whiteEnd; i++ {
 			whiteTemp = append(whiteTemp, uint32(i))
 		}
-		blackTemp = utils2.StringToUint32Slice(black)
+		blackTemp = utils.StringToUint32Slice(black)
 	}
 	if num1 == 0 && num2 == 1 {
 		// 白名单为单独的数字，黑名单为端口段
@@ -272,7 +270,7 @@ func (tree *ACL_tree) ACL_Tree_Insert_Lot(cidr string, white string, black strin
 		for i := blackStart; i <= blackEnd; i++ {
 			blackTemp = append(blackTemp, uint32(i))
 		}
-		whiteTemp = utils2.StringToUint32Slice(white)
+		whiteTemp = utils.StringToUint32Slice(white)
 	}
 	if num1 == 1 && num2 == 1 {
 		// 黑白名单均为端口段
