@@ -45,4 +45,11 @@ func main() {
 
 	white, black = aclTree.ACL_Tree_Search("192.168.1.111")
 	fmt.Println(white, black)
+
+	err = aclTree.ACL_Tree_Insert_Lot("192.168.0.0/16", "100-120", "199-203")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	white, black = aclTree.ACL_Tree_Search("192.168.1.111")
+	fmt.Println(white, black)
 }

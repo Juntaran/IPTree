@@ -8,8 +8,10 @@ package ACLTree
 
 import (
 	"IPTree/Radinx_IP_Tree/utils"
+	utils2 "IPTree/ACLTree/utils"
 	"errors"
 	"sort"
+	"strconv"
 )
 
 // Nginx radix tree source code
@@ -18,11 +20,11 @@ import (
 
 // acl 节点结构体
 type acl_node struct {
-	left	*acl_node
-	right	*acl_node
-	parent	*acl_node
-	white 	utils.Uint32Slice		// 白名单 port
-	black	utils.Uint32Slice		// 黑名单 port
+	left		*acl_node
+	right		*acl_node
+	parent		*acl_node
+	white 		utils.Uint32Slice		// 白名单 port
+	black		utils.Uint32Slice		// 黑名单 port
 }
 
 // acl tree 结构体  对外开放
@@ -43,6 +45,7 @@ func (tree *ACL_tree) newNode() (p *acl_node) {
 		p.parent = nil
 		p.white = nil
 		p.black = nil
+		p.protocol = nil
 		return p
 	}
 
@@ -201,6 +204,91 @@ func (tree *ACL_tree) ACL_Tree_Insert(cidr string, white utils.Uint32Slice, blac
 		return err
 	}
 	return tree.acl_tree_insert(ip, mask, white, black)
+}
+
+// 插入的黑白名单为一段 例如 tree.ACL_Tree_Insert_Lot(192.168.1.0/24, 1-100, 101-200)
+func (tree *ACL_tree) ACL_Tree_Insert_Lot(cidr string, white string, black string) error {
+	// 检查插入的黑白名单格式是否正确
+	// 插入的黑白名单只能有两种形式:
+	// 1. 单个数字 100
+	// 2. 端口范围 100-200
+	var num1, num2 int
+	var pos1, pos2 int
+	for i := 0; i < len(white); {
+		if white[i] >= '0' && white[i] <= '9' {
+			i ++
+		} else if white[i] == '-' {
+			if i == 0 || i == len(white)-1 {
+				return errors.New("Error: Wrong Input")
+			}
+			num1 ++
+			pos1 = i
+			if num1 > 1 {
+				return errors.New("Error: Wrong Input")
+			}
+			i ++
+		} else {
+			return errors.New("Error: Wrong Input")
+		}
+	}
+	for i := 0; i < len(black); {
+		if black[i] >= '0' && black[i] <= '9' {
+			i ++
+		} else if black[i] == '-' {
+			if i == 0 || i == len(black)-1 {
+				return errors.New("Error: Wrong Input")
+			}
+			num2 ++
+			pos2 = i
+			if num2 > 1 {
+				return errors.New("Error: Wrong Input")
+			}
+			i ++
+		} else {
+			return errors.New("Error: Wrong Input")
+		}
+	}
+	var whiteStart, whiteEnd, blackStart, blackEnd int
+	var whiteTemp []uint32
+	var blackTemp []uint32
+	if num1 == 0 && num2 == 0 {
+		// 输入的黑白名单都是单独的数字
+		whiteTemp = utils2.StringToUint32Slice(white)
+		blackTemp = utils2.StringToUint32Slice(black)
+	}
+	if num1 == 1 && num2 == 0 {
+		// 白名单为端口段，黑名单为单独的数字
+		whiteStart, _ = strconv.Atoi(white[:pos1])
+		whiteEnd, _ = strconv.Atoi(white[pos1+1:])
+		for i := whiteStart; i <= whiteEnd; i++ {
+			whiteTemp = append(whiteTemp, uint32(i))
+		}
+		blackTemp = utils2.StringToUint32Slice(black)
+	}
+	if num1 == 0 && num2 == 1 {
+		// 白名单为单独的数字，黑名单为端口段
+		blackStart, _ = strconv.Atoi(black[:pos2])
+		blackEnd, _ = strconv.Atoi(black[pos2+1:])
+		for i := blackStart; i <= blackEnd; i++ {
+			blackTemp = append(blackTemp, uint32(i))
+		}
+		whiteTemp = utils2.StringToUint32Slice(white)
+	}
+	if num1 == 1 && num2 == 1 {
+		// 黑白名单均为端口段
+		whiteStart, _ = strconv.Atoi(white[:pos1])
+		whiteEnd, _ = strconv.Atoi(white[pos1+1:])
+		blackStart, _ = strconv.Atoi(black[:pos2])
+		blackEnd, _ = strconv.Atoi(black[pos2+1:])
+
+		for i := whiteStart; i <= whiteEnd; i++ {
+			whiteTemp = append(whiteTemp, uint32(i))
+		}
+		for i := blackStart; i <= blackEnd; i++ {
+			blackTemp = append(blackTemp, uint32(i))
+		}
+	}
+	return tree.ACL_Tree_Insert(cidr, whiteTemp, blackTemp)
 }
 
 func (tree *ACL_tree) ACL_Tree_Delete(cidr string) error {
