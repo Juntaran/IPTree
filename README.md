@@ -19,11 +19,11 @@ value 值也就是 端口号为 Uint32Slice 类型 (uint32[])
 
 ## Todo:
 
-| ID  | Todo  | Dobe  |
+| ID  | Todo  | Done  |
 |---|---|---|
 | 1  | 增加端口号范围  | √  |
 | 2  | 五元组匹配  |   |
-| 3  | 黑白名单  |   |
+| 3  | 黑白名单  | √  |
 | 4  | Golang重写  | √  |
 | 5  | Radix Tree版本  | √  | 
 
