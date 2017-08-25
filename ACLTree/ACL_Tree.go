@@ -1,7 +1,7 @@
 /** 
   * Author: Juntaran 
   * Email:  Jacinthmail@gmail.com 
-  * Date:   2017/8/22 16:46 
+  * Date:   2017/8/25 10:12
   */
 
 package ACLTree
@@ -254,7 +254,8 @@ func (tree *ACL_tree) ACL_Tree_Delete(cidr string) error {
 }
 
 // 查找一个ip，这里的输入应为 192.168.1.1/32
-func (tree *ACL_tree) ACL_Tree_Search(cidr string) ([]uint32, []uint32) {
+func (tree *ACL_tree) ACL_Tree_Search(sip string) ([]uint32, []uint32) {
+	cidr := sip + "/32"
 	ip, _, err := utils.ParseCidr4(cidr)
 	if err != nil {
 		return nil, nil
