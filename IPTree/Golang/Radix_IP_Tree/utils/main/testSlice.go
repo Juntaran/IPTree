@@ -7,7 +7,7 @@
 package main
 
 import (
-	"IPTree/Radinx_IP_Tree/utils"
+	"IPTree/IPTree/Golang/Radix_IP_Tree/utils"
 	"fmt"
 	"sort"
 )

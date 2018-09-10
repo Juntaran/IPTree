@@ -7,7 +7,7 @@
 package Radinx_IP_Tree
 
 import (
-	"IPTree/Radinx_IP_Tree/utils"
+	"IPTree/IPTree/Golang/Radix_IP_Tree/utils"
 	"errors"
 	"sort"
 )
